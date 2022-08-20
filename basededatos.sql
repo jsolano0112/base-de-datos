@@ -5,15 +5,16 @@ USE basededatosdos;
 go
 
 CREATE TABLE asignatura
-(idCodigo varchar(4) CONSTRAINT PK_codigo primary key(codigo), 
-numero varchar (4),
+(idCodigo varchar(4) CONSTRAINT PK_codigo primary key(idCodigo), 
+numero varchar (4) UNIQUE,
 tipo varchar(100),
 curso varchar(100),
-duracion varchar(100),
+duracion varchar(100) NOT NULL,
 lib_conf varchar(100),
 lim_adm varchar(100),
-CONSTRAINT FK_incompat FOREIGN KEY idCodigo references asignatura(idCodigo),
-CONSTRAINT FK_equivale FOREIGN KEY idCodigo references asignatura(idCodigo));
+contenido varchar(1000),
+incompat varchar(10),
+equivale varchar(10))
 go
 
 CREATE TABLE creditos
@@ -21,7 +22,7 @@ CREATE TABLE creditos
 practico bit,
 teorico bit,---definir si uno solo
 idCodigo varchar(4),
-CONSTRAINT FK_idCodigo FOREIGN KEY idCodigo references asignatura(idCodigo));
+constraint FK_asignaturaCre FOREIGN KEY(idCodigo) references asignatura(idCodigo));
 go
 
 CREATE TABLE grupos
@@ -29,53 +30,64 @@ CREATE TABLE grupos
 practico bit,
 teorico bit,
 idCodigo varchar(4),
-CONSTRAINT FK_idCodigo FOREIGN KEY idCodigo references asignatura(idCodigo));
+CONSTRAINT FK_asignaturaGru FOREIGN KEY (idCodigo) references asignatura(idCodigo));
 go
 
 CREATE TABLE titulacion
-(idTitulacion varchar(4) CONSTRAINT PK_titulacion(idTitulacion),
-nombre varchar(100),
-CONSTRAINT FK_idCodigo FOREIGN KEY idCodigo references asignatura(idCodigo));
+(nombreTitulacion varchar(30) CONSTRAINT PK_titulacion primary key(nombreTitulacion),
+fecha date,
+idCodigo varchar(4),
+CONSTRAINT FK_asignaturaTitu FOREIGN KEY(idCodigo) references asignatura(idCodigo));
 go
 
 CREATE TABLE asignaturaTitulacion 
 (idCodigo varchar(4),
-idTitulacion varchar(4),
-CONSTRAINT PK_asignaturaTitulacion PRIMARY KEY(idCodigo,idTitulacion),
-CONSTRAINT FK_asignaturaA FOREIGN KEY idCodigo references asignatura(idCodigo),
-CONSTRAINT FK_titulacionA FOREIGN KEY idTitulacion references titulacion(idTitulacion));
+nombreTitulacion varchar(30),
+CONSTRAINT PK_asignaturaTitulacion PRIMARY KEY(idCodigo,nombreTitulacion),
+CONSTRAINT FK_asignaturaA FOREIGN KEY (idCodigo) references asignatura(idCodigo),
+CONSTRAINT FK_titulacionA FOREIGN KEY (nombreTitulacion) references titulacion(nombreTitulacion));
 go
 
 CREATE TABLE profesor
-(idProfesor varchar(30) CONSTRAINT PK_prof(idProfesor),
-nombre varchar(100),
-despacho varchar(10));
+(idProfe varchar(10) CONSTRAINT PK_prof PRIMARY KEY(idProfe),
+nombre varchar(100) NOT NULL,
+apellido varchar(100) NOT NULL,
+despacho varchar(10) UNIQUE,
+correo varchar(70) NOT NULL UNIQUE);
 go
 
 CREATE TABLE asignaturaProfesor 
 (idCodigo varchar(4),
-idProfesor varchar(30),
-CONSTRAINT PK_asignaturaProfesor PRIMARY KEY(idCodigo,idProfesor),
-CONSTRAINT FK_asignaturaB FOREIGN KEY idCodigo references asignatura(idCodigo),
-CONSTRAINT FK_profesorB FOREIGN KEY idProfesor references profesor(idProfesor));
+idProfe varchar(10),
+CONSTRAINT PK_asignaturaProfesor PRIMARY KEY(idCodigo,idProfe),
+CONSTRAINT FK_asignaturaB FOREIGN KEY (idCodigo) references asignatura(idCodigo),
+CONSTRAINT FK_profesorB FOREIGN KEY (idProfe) references profesor(idProfe));
 go
 
 CREATE TABLE consultas
-(idConsultas varchar(100),
-fechaHora date,
-idProfesor varchar(30),
-CONSTRAINT FK_profesorB FOREIGN KEY idProfesor references profesor(idProfesor));
+(idConsultas varchar(100) CONSTRAINT PK_consultas PRIMARY KEY(idConsultas),
+fechaHora date NOT NULL,
+idProfe varchar(10),
+CONSTRAINT FK_profesorB FOREIGN KEY (idProfe) references profesor(idProfe));
 go
 
 CREATE TABLE area
-(idArea varchar(10) CONSTRAINT PK_area PRIMARY KEY(idArea),
-nombre varchar(30),
-CONSTRAINT FK_profesorB FOREIGN KEY idProfesor references profesor(idProfesor)
-CONSTRAINT FK_asignaturaB FOREIGN KEY idCodigo references asignatura(idCodigo));
+(nombreArea varchar(30) CONSTRAINT PK_area PRIMARY KEY(nombreArea),
+idProfe varchar(10),
+idCodigo varchar(4),
+CONSTRAINT FK_profesorB FOREIGN KEY (idProfe) references profesor(idProfe),
+CONSTRAINT FK_asignaturaB FOREIGN KEY(idCodigo) references asignatura(idCodigo));
 go
 
 CREATE TABLE departamento 
-(idDepartamento varchar(10) CONSTRAINT PK_departamento PRIMARY KEY(idDepartamento),
-nombre varchar(30),
-idArea varchar(10),
-CONSTRAINT FK_area FOREIGN KEY idArea references area(idArea);
+(nombreDepa varchar(10) CONSTRAINT PK_departamento PRIMARY KEY(nombreDepa),
+nombreArea varchar(30),
+CONSTRAINT FK_area FOREIGN KEY (nombreArea) references area(nombreArea);
+go
+
+
+----INSERTAR
+
+----ACTUALIZAR
+
+
